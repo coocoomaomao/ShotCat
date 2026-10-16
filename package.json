@@ -1,7 +1,7 @@
 {
   "name":"shotcat-desktop",
-  "version":"0.1.0",
-  "description":"ShotCat 截图上镜猫 - local-first screenshot beautifier",
+  "version":"0.2.0",
+  "description":"ShotCat 截图上镜猫 - local-first screenshot beautifier and promo-image maker",
   "author":"MeowBuild Lab",
   "license":"MIT",
   "main":"electron/main.cjs",
