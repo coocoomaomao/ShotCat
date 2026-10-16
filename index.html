@@ -18,7 +18,7 @@
         <path d="M29 49q4-3 8 0-4 5-8 0Z" fill="#f29a91"/>
       </svg>
     </div>
-    <div><b>ShotCat</b><span>截图上镜猫 · 喵造实验室 012 · v0.3</span></div>
+    <div><b>ShotCat</b><span>截图上镜猫 · 喵造实验室 012 · v0.4</span></div>
   </div>
   <div class="privacy">纯本地 · 截图不上传</div>
 </header>
@@ -28,7 +28,7 @@
   <section class="card intro">
     <span class="eyebrow">SCREENSHOT → PROMO</span>
     <h1>截图只是素材，<br><em>宣传图才是结果。</em></h1>
-    <p>v0.3 新增「海报模板库」：软件首发、功能更新、Before & After、免费工具、GitHub 开源，一键套版直接发。</p>
+    <p>v0.4 新增「我的模板」：把调好的文案、主题、尺寸和截图细节保存下来，下次一键复用。</p>
     <button id="chooseBtn" class="primary">选择截图</button>
   </section>
 
@@ -65,8 +65,19 @@
     </div>
   </section>
 
+  <section class="card custom-template-card" id="customTemplateCard">
+    <div class="titlebar"><span>02</span><b>我的模板</b></div>
+    <div class="custom-template-save">
+      <input id="customTemplateName" type="text" maxlength="28" placeholder="给当前样式起个名字">
+      <button id="saveTemplateBtn" class="secondary">保存当前样式</button>
+    </div>
+    <small class="note left-note">只保存样式和文案，不保存截图 · 最多 20 个</small>
+    <div class="custom-template-list" id="customTemplateList"></div>
+    <div class="template-empty" id="customTemplateEmpty">还没有自己的模板。调好一张图后，点「保存当前样式」就会出现在这里。</div>
+  </section>
+
   <section class="card">
-    <div class="titlebar"><span>02</span><b>画布尺寸</b></div>
+    <div class="titlebar"><span>03</span><b>画布尺寸</b></div>
     <div class="grid presets">
       <button data-preset="xhs34" class="active">小红书<small>1080×1440</small></button>
       <button data-preset="square">方图<small>1080×1080</small></button>
@@ -77,7 +88,7 @@
   </section>
 
   <section class="card">
-    <div class="titlebar"><span>03</span><b>视觉风格</b></div>
+    <div class="titlebar"><span>04</span><b>视觉风格</b></div>
     <div class="grid themes">
       <button data-theme="mint" class="mint active">Mint</button>
       <button data-theme="dark" class="dark">Dark</button>
@@ -89,7 +100,7 @@
   </section>
 
   <section class="card promo-only" id="promoCard">
-    <div class="titlebar"><span>04</span><b>宣传文案</b></div>
+    <div class="titlebar"><span>05</span><b>宣传文案</b></div>
     <label>产品名<input id="productName" value="ShotCat 截图上镜猫"></label>
     <label>顶部角标<input id="kicker" value="喵造实验室 012 · WINDOWS"></label>
     <label>主标题<input id="promoTitle" value="截图太素？让猫给它化个妆。"></label>
@@ -99,19 +110,19 @@
       <label>卖点 2<input id="chip2" value="小红书 3:4"></label>
       <label>卖点 3<input id="chip3" value="本地处理"></label>
     </div>
-    <label>右上徽章<input id="badgeText" value="NEW · v0.2"></label>
+    <label>右上徽章<input id="badgeText" value="NEW · v0.4"></label>
     <label class="toggle"><input id="showBrand" type="checkbox" checked> 显示「喵造实验室」角标</label>
   </section>
 
   <section class="card beautify-only hidden" id="beautifyCard">
-    <div class="titlebar"><span>04</span><b>自由标题</b></div>
+    <div class="titlebar"><span>05</span><b>自由标题</b></div>
     <label>主标题<input id="mainTitle" value="截图太素？让猫给它化个妆。"></label>
     <label>副标题<input id="subtitle" value="ShotCat · 一键生成好看的分享图"></label>
     <label class="toggle"><input id="showTitle" type="checkbox" checked> 显示标题区</label>
   </section>
 
   <section class="card">
-    <div class="titlebar"><span>05</span><b>截图细节</b></div>
+    <div class="titlebar"><span>06</span><b>截图细节</b></div>
     <label class="toggle"><input id="windowFrame" type="checkbox" checked> 模拟窗口标题栏</label>
     <label>留白 <span id="paddingValue">90</span><input id="padding" type="range" min="30" max="180" value="90"></label>
     <label>截图圆角 <span id="radiusValue">30</span><input id="radius" type="range" min="0" max="70" value="30"></label>

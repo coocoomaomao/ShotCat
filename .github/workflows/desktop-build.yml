@@ -41,5 +41,5 @@ jobs:
           if (gh release view $tag --repo "${{ github.repository }}" 2>$null) {
             gh release upload $tag $asset --clobber --repo "${{ github.repository }}"
           } else {
-            gh release create $tag $asset --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "ShotCat 截图上镜猫 v$version" --notes "Windows x64 安装版。截图本地美化：背景、留白、圆角、阴影、标题和常用社交媒体尺寸预设。"
+            gh release create $tag $asset --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "ShotCat 截图上镜猫 v$version" --notes "Windows x64 安装版。v$version：支持海报模板库、Before & After，以及「我的模板」本地保存、套用、覆盖、改名和删除。截图全程本地处理。"
           }

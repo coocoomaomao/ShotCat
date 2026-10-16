@@ -1,40 +1,60 @@
 {
-  "name":"shotcat-desktop",
-  "version":"0.3.0",
-  "description":"ShotCat 截图上镜猫 - local-first screenshot beautifier and promo-image maker",
-  "author":"MeowBuild Lab",
-  "license":"MIT",
-  "main":"electron/main.cjs",
-  "scripts":{
-    "start":"electron .",
-    "test":"node --test tests/core.test.cjs",
-    "check":"node --check app.js && node --check electron/main.cjs && node --check electron/preload.cjs && node --check electron/shotcat-core.cjs",
-    "build:icon":"node scripts/build-icon.cjs",
-    "dist:win":"npm run build:icon && electron-builder --win nsis --publish never"
+  "name": "shotcat-desktop",
+  "version": "0.4.0",
+  "description": "ShotCat 截图上镜猫 - local-first screenshot beautifier and promo-image maker",
+  "author": "MeowBuild Lab",
+  "license": "MIT",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/core.test.cjs",
+    "check": "node --check app.js && node --check electron/main.cjs && node --check electron/preload.cjs && node --check electron/shotcat-core.cjs",
+    "build:icon": "node scripts/build-icon.cjs",
+    "dist:win": "npm run build:icon && electron-builder --win nsis --publish never"
   },
-  "devDependencies":{
-    "electron":"^38.0.0",
-    "electron-builder":"^26.0.12",
-    "png-to-ico":"^3.0.1",
-    "sharp":"^0.34.4"
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.12",
+    "png-to-ico": "^3.0.1",
+    "sharp": "^0.34.4"
   },
-  "build":{
-    "appId":"com.meowbuild.shotcat",
-    "productName":"ShotCat 截图上镜猫",
-    "asar":true,
-    "files":["index.html","styles.css","app.js","electron/**/*","README.md","build/**/*"],
-    "directories":{"output":"dist"},
-    "win":{"target":[{"target":"nsis","arch":["x64"]}],"forceCodeSigning":false,"icon":"build/icon.ico"},
-    "nsis":{
-      "oneClick":false,
-      "allowToChangeInstallationDirectory":true,
-      "createDesktopShortcut":true,
-      "createStartMenuShortcut":true,
-      "shortcutName":"ShotCat 截图上镜猫",
-      "deleteAppDataOnUninstall":false,
-      "installerIcon":"build/icon.ico",
-      "uninstallerIcon":"build/icon.ico",
-      "installerHeaderIcon":"build/icon.ico"
+  "build": {
+    "appId": "com.meowbuild.shotcat",
+    "productName": "ShotCat 截图上镜猫",
+    "asar": true,
+    "files": [
+      "index.html",
+      "styles.css",
+      "app.js",
+      "electron/**/*",
+      "README.md",
+      "build/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "forceCodeSigning": false,
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ShotCat 截图上镜猫",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
     }
   }
 }

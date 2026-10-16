@@ -2,7 +2,9 @@ const $=s=>document.querySelector(s);
 const canvas=$('#canvas'),ctx=canvas.getContext('2d');
 
 let image=null,compareImage=null,sourcePath=null,compareSourcePath=null;
-let currentPreset='xhs34',currentTheme='mint',currentMode='promo',currentTemplate='launch',lastExport=null;
+let currentPreset='xhs34',currentTheme='mint',currentMode='promo',currentTemplate='launch',lastExport=null,activeCustomTemplateId=null;
+const CUSTOM_TEMPLATE_KEY='shotcat.customTemplates.v1';
+let customTemplates=[];
 
 const PRESETS={
   xhs34:{w:1080,h:1440},
@@ -29,15 +31,15 @@ const TEMPLATES={
     title:'截图太素？让猫给它化个妆。',
     subtitle:'拖进截图，一键生成能直接发的小红书宣传图',
     chips:['一键美化','小红书 3:4','本地处理'],
-    badge:'NEW · v0.3'
+    badge:'NEW · v0.4'
   },
   update:{
     preset:'xhs34',theme:'lavender',
-    product:'ShotCat v0.3',
+    product:'ShotCat v0.4',
     kicker:'PRODUCT UPDATE · NEW VERSION',
-    title:'这次更新，真的更会做宣传图了。',
-    subtitle:'新增海报模板库：首发、更新、对比、免费、开源一键套版',
-    chips:['模板库','一键套版','完整像素导出'],
+    title:'这次更新，可以存下你自己的模板了。',
+    subtitle:'调好一次，保存下来；下一张图直接一键套用自己的样式',
+    chips:['我的模板','本地保存','一键复用'],
     badge:'UPDATE'
   },
   compare:{
@@ -68,6 +70,158 @@ const TEMPLATES={
     badge:'OPEN SOURCE'
   }
 };
+
+
+function normalizeCustomTemplate(raw){
+  if(!raw||typeof raw!=='object')return null;
+  const preset=PRESETS[raw.preset]?raw.preset:'xhs34';
+  const theme=THEMES[raw.theme]?raw.theme:'mint';
+  const mode=raw.mode==='beautify'?'beautify':'promo';
+  const layoutTemplate=TEMPLATES[raw.layoutTemplate]?raw.layoutTemplate:'launch';
+  const values=raw.values&&typeof raw.values==='object'?raw.values:{};
+  return{
+    id:String(raw.id||('tpl-'+Date.now()+'-'+Math.random().toString(36).slice(2,7))),
+    name:String(raw.name||'我的模板').slice(0,28),
+    createdAt:Number(raw.createdAt)||Date.now(),
+    updatedAt:Number(raw.updatedAt)||Date.now(),
+    mode,preset,theme,layoutTemplate,
+    values:{
+      productName:String(values.productName??''),
+      kicker:String(values.kicker??''),
+      promoTitle:String(values.promoTitle??''),
+      promoSubtitle:String(values.promoSubtitle??''),
+      chip1:String(values.chip1??''),
+      chip2:String(values.chip2??''),
+      chip3:String(values.chip3??''),
+      badgeText:String(values.badgeText??''),
+      mainTitle:String(values.mainTitle??''),
+      subtitle:String(values.subtitle??''),
+      showBrand:values.showBrand!==false,
+      showTitle:values.showTitle!==false,
+      windowFrame:values.windowFrame!==false,
+      padding:Math.max(30,Math.min(180,Number(values.padding)||90)),
+      radius:Math.max(0,Math.min(70,Number(values.radius)||30)),
+      shadow:Math.max(0,Math.min(100,Number(values.shadow)||55)),
+      scale:Math.max(60,Math.min(110,Number(values.scale)||100))
+    }
+  };
+}
+
+function loadCustomTemplates(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(CUSTOM_TEMPLATE_KEY)||'[]');
+    customTemplates=Array.isArray(raw)?raw.map(normalizeCustomTemplate).filter(Boolean).slice(0,20):[];
+  }catch(_e){customTemplates=[]}
+}
+
+function persistCustomTemplates(){
+  try{localStorage.setItem(CUSTOM_TEMPLATE_KEY,JSON.stringify(customTemplates))}
+  catch(_e){toast('模板保存失败：本地存储不可用')}
+}
+
+function captureCurrentTemplate(name,id=null,createdAt=null){
+  return normalizeCustomTemplate({
+    id:id||('tpl-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),
+    name,
+    createdAt:createdAt||Date.now(),
+    updatedAt:Date.now(),
+    mode:currentMode,preset:currentPreset,theme:currentTheme,layoutTemplate:currentTemplate,
+    values:{
+      productName:$('#productName').value,kicker:$('#kicker').value,
+      promoTitle:$('#promoTitle').value,promoSubtitle:$('#promoSubtitle').value,
+      chip1:$('#chip1').value,chip2:$('#chip2').value,chip3:$('#chip3').value,
+      badgeText:$('#badgeText').value,mainTitle:$('#mainTitle').value,subtitle:$('#subtitle').value,
+      showBrand:$('#showBrand').checked,showTitle:$('#showTitle').checked,windowFrame:$('#windowFrame').checked,
+      padding:$('#padding').value,radius:$('#radius').value,shadow:$('#shadow').value,scale:$('#scale').value
+    }
+  });
+}
+
+function customTemplateMeta(t){
+  const p=PRESETS[t.preset],mode=t.mode==='promo'?'宣传图':'自由美化';
+  return mode+' · '+p.w+'×'+p.h+' · '+t.theme;
+}
+
+function renderCustomTemplates(){
+  const list=$('#customTemplateList'),empty=$('#customTemplateEmpty');
+  if(!list||!empty)return;
+  list.textContent='';
+  empty.classList.toggle('hidden',customTemplates.length>0);
+  customTemplates.forEach(t=>{
+    const row=document.createElement('div');
+    row.className='custom-template-item'+(activeCustomTemplateId===t.id?' active':'');
+    const main=document.createElement('button');
+    main.className='custom-template-main';main.dataset.action='apply';main.dataset.id=t.id;
+    const strong=document.createElement('strong');strong.textContent=t.name;
+    const small=document.createElement('small');small.textContent=customTemplateMeta(t);
+    main.append(strong,small);
+    const actions=document.createElement('div');actions.className='custom-template-actions';
+    [['overwrite','覆盖'],['rename','改名'],['delete','删除']].forEach(([action,label])=>{
+      const b=document.createElement('button');b.dataset.action=action;b.dataset.id=t.id;b.textContent=label;actions.appendChild(b);
+    });
+    row.append(main,actions);list.appendChild(row);
+  });
+}
+
+function clearCustomActive(){
+  if(!activeCustomTemplateId)return;
+  activeCustomTemplateId=null;renderCustomTemplates();
+}
+
+function saveCurrentTemplate(){
+  if(customTemplates.length>=20){toast('最多保存 20 个模板');return}
+  const input=$('#customTemplateName');
+  const name=(input.value.trim()||('我的模板 '+(customTemplates.length+1))).slice(0,28);
+  const t=captureCurrentTemplate(name);
+  customTemplates.unshift(t);activeCustomTemplateId=t.id;
+  persistCustomTemplates();renderCustomTemplates();input.value='';
+  document.querySelectorAll('[data-template]').forEach(x=>x.classList.remove('active'));
+  toast('已保存「'+name+'」');
+}
+
+function applyCustomTemplate(id){
+  const t=customTemplates.find(x=>x.id===id);if(!t)return;
+  currentMode=t.mode;currentTemplate=t.layoutTemplate;
+  activatePreset(t.preset);activateTheme(t.theme);
+  const v=t.values;
+  $('#productName').value=v.productName;$('#kicker').value=v.kicker;
+  $('#promoTitle').value=v.promoTitle;$('#promoSubtitle').value=v.promoSubtitle;
+  $('#chip1').value=v.chip1;$('#chip2').value=v.chip2;$('#chip3').value=v.chip3;$('#badgeText').value=v.badgeText;
+  $('#mainTitle').value=v.mainTitle;$('#subtitle').value=v.subtitle;
+  $('#showBrand').checked=v.showBrand;$('#showTitle').checked=v.showTitle;$('#windowFrame').checked=v.windowFrame;
+  $('#padding').value=v.padding;$('#radius').value=v.radius;$('#shadow').value=v.shadow;$('#scale').value=v.scale;
+  $('#paddingValue').textContent=v.padding;$('#radiusValue').textContent=v.radius;
+  $('#shadowValue').textContent=v.shadow;$('#scaleValue').textContent=v.scale+'%';
+  activeCustomTemplateId=t.id;
+  document.querySelectorAll('[data-template]').forEach(x=>x.classList.remove('active'));
+  syncMode();renderCustomTemplates();toast('已套用「'+t.name+'」');
+}
+
+function renameCustomTemplate(id){
+  const t=customTemplates.find(x=>x.id===id);if(!t)return;
+  const next=prompt('模板新名字',t.name);if(next===null)return;
+  const name=next.trim().slice(0,28);if(!name){toast('模板名不能为空');return}
+  t.name=name;t.updatedAt=Date.now();persistCustomTemplates();renderCustomTemplates();toast('模板已改名');
+}
+
+function overwriteCustomTemplate(id){
+  const i=customTemplates.findIndex(x=>x.id===id);if(i<0)return;
+  const old=customTemplates[i];
+  if(!confirm('用当前画面参数覆盖「'+old.name+'」？'))return;
+  customTemplates[i]=captureCurrentTemplate(old.name,old.id,old.createdAt);
+  activeCustomTemplateId=old.id;persistCustomTemplates();renderCustomTemplates();
+  document.querySelectorAll('[data-template]').forEach(x=>x.classList.remove('active'));
+  toast('模板已更新');
+}
+
+function deleteCustomTemplate(id){
+  const t=customTemplates.find(x=>x.id===id);if(!t)return;
+  if(!confirm('删除模板「'+t.name+'」？'))return;
+  customTemplates=customTemplates.filter(x=>x.id!==id);
+  if(activeCustomTemplateId===id)activeCustomTemplateId=null;
+  persistCustomTemplates();renderCustomTemplates();toast('模板已删除');
+}
+
 
 function toast(msg){
   const t=$('#toast');t.textContent=msg;t.classList.add('show');
@@ -382,6 +536,7 @@ function activateTheme(id){
 
 function applyTemplate(id){
   const t=TEMPLATES[id];if(!t)return;
+  activeCustomTemplateId=null;
   currentTemplate=id;currentMode='promo';
   activatePreset(t.preset);activateTheme(t.theme);
 
@@ -395,6 +550,7 @@ function applyTemplate(id){
   $('#badgeText').value=t.badge;
 
   document.querySelectorAll('[data-template]').forEach(x=>x.classList.toggle('active',x.dataset.template===id));
+  renderCustomTemplates();
   $('#compareTools').classList.toggle('hidden',id!=='compare');
   syncMode();
   toast('已套用「'+document.querySelector('[data-template="'+id+'"] strong').textContent+'」');
@@ -414,10 +570,20 @@ function syncMode(){
 $('#chooseBtn').addEventListener('click',choosePrimary);
 $('#emptyChooseBtn').addEventListener('click',choosePrimary);
 $('#chooseCompareBtn').addEventListener('click',chooseCompare);
+$('#saveTemplateBtn').addEventListener('click',saveCurrentTemplate);
+$('#customTemplateName').addEventListener('keydown',e=>{if(e.key==='Enter')saveCurrentTemplate()});
+$('#customTemplateList').addEventListener('click',e=>{
+  const b=e.target.closest('[data-action]');if(!b)return;
+  const {action,id}=b.dataset;
+  if(action==='apply')applyCustomTemplate(id);
+  else if(action==='rename')renameCustomTemplate(id);
+  else if(action==='overwrite')overwriteCustomTemplate(id);
+  else if(action==='delete')deleteCustomTemplate(id);
+});
 
 $('#modeSwitch').addEventListener('click',e=>{
   const b=e.target.closest('[data-mode]');if(!b)return;
-  currentMode=b.dataset.mode;syncMode();
+  clearCustomActive();currentMode=b.dataset.mode;syncMode();
 });
 
 $('#templateGrid').addEventListener('click',e=>{
@@ -427,16 +593,17 @@ $('#templateGrid').addEventListener('click',e=>{
 
 document.querySelector('.presets').addEventListener('click',e=>{
   const b=e.target.closest('[data-preset]');if(!b)return;
-  activatePreset(b.dataset.preset);render();
+  clearCustomActive();activatePreset(b.dataset.preset);render();
 });
 
 document.querySelector('.themes').addEventListener('click',e=>{
   const b=e.target.closest('[data-theme]');if(!b)return;
-  activateTheme(b.dataset.theme);render();
+  clearCustomActive();activateTheme(b.dataset.theme);render();
 });
 
 ['productName','kicker','promoTitle','promoSubtitle','chip1','chip2','chip3','badgeText','showBrand','mainTitle','subtitle','showTitle','windowFrame','padding','radius','shadow','scale'].forEach(id=>{
   $('#'+id).addEventListener('input',()=>{
+    clearCustomActive();
     $('#paddingValue').textContent=$('#padding').value;
     $('#radiusValue').textContent=$('#radius').value;
     $('#shadowValue').textContent=$('#shadow').value;
@@ -460,4 +627,6 @@ $('#exportBtn').addEventListener('click',async()=>{
 
 $('#openBtn').addEventListener('click',()=>{if(lastExport)window.shotcat.revealFile(lastExport)});
 
+loadCustomTemplates();
 applyTemplate('launch');
+renderCustomTemplates();
