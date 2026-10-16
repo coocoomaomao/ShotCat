@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ShotCat 截图上镜猫</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-icon">😼</div><div><b>ShotCat</b><span>截图上镜猫 · 喵造实验室 012 · v0.1</span></div></div>
+  <div class="privacy">纯本地 · 截图不上传</div>
+</header>
+<main class="layout">
+<aside class="controls">
+  <section class="card intro">
+    <span class="eyebrow">SCREENSHOT BEAUTIFIER</span>
+    <h1>截图太素？<br><em>让猫给它化个妆。</em></h1>
+    <p>加背景、留白、圆角、阴影和标题，一键导出可以直接发小红书的宣传图。</p>
+    <button id="chooseBtn" class="primary">选择截图</button>
+  </section>
+
+  <section class="card">
+    <div class="titlebar"><span>01</span><b>画布尺寸</b></div>
+    <div class="grid presets">
+      <button data-preset="xhs34" class="active">小红书<small>1080×1440</small></button>
+      <button data-preset="square">方图<small>1080×1080</small></button>
+      <button data-preset="video169">16:9<small>1920×1080</small></button>
+      <button data-preset="story916">9:16<small>1080×1920</small></button>
+      <button data-preset="readme">README<small>1600×900</small></button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="titlebar"><span>02</span><b>风格模板</b></div>
+    <div class="grid themes">
+      <button data-theme="mint" class="mint active">Mint</button>
+      <button data-theme="dark" class="dark">Dark</button>
+      <button data-theme="sunset" class="sunset">Sunset</button>
+      <button data-theme="lavender" class="lavender">Lavender</button>
+      <button data-theme="cream" class="cream">Cream</button>
+      <button data-theme="minimal" class="minimal">Minimal</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="titlebar"><span>03</span><b>标题</b></div>
+    <label>主标题<input id="mainTitle" value="截图太素？让猫给它化个妆。"></label>
+    <label>副标题<input id="subtitle" value="ShotCat · 一键生成好看的分享图"></label>
+    <label class="toggle"><input id="showTitle" type="checkbox" checked>显示标题区</label>
+    <label class="toggle"><input id="windowFrame" type="checkbox" checked>模拟窗口标题栏</label>
+  </section>
+
+  <section class="card">
+    <div class="titlebar"><span>04</span><b>细节</b></div>
+    <label>留白 <span id="paddingValue">90</span><input id="padding" type="range" min="30" max="180" value="90"></label>
+    <label>截图圆角 <span id="radiusValue">30</span><input id="radius" type="range" min="0" max="70" value="30"></label>
+    <label>阴影 <span id="shadowValue">55</span><input id="shadow" type="range" min="0" max="100" value="55"></label>
+    <label>截图缩放 <span id="scaleValue">100%</span><input id="scale" type="range" min="65" max="110" value="100"></label>
+  </section>
+
+  <section class="card">
+    <button id="exportBtn" class="primary wide" disabled>导出 PNG</button>
+    <button id="openBtn" class="secondary wide" hidden>打开导出位置</button>
+    <small class="note">实际导出为所选预设完整像素尺寸。</small>
+  </section>
+</aside>
+
+<section class="stage">
+  <div class="stage-head">
+    <div><small>实时预览</small><b id="stageSize">1080 × 1440</b></div>
+    <span id="sourceName">还没有选择截图</span>
+  </div>
+  <div class="stage-shell">
+    <canvas id="canvas" width="1080" height="1440"></canvas>
+    <div id="empty" class="empty">
+      <div class="empty-cat">😼</div><b>先给猫一张截图</b><span>支持 PNG / JPG / WEBP</span>
+      <button id="emptyChooseBtn" class="secondary">选择截图</button>
+    </div>
+  </div>
+  <div class="tips"><span>✓ 本地处理</span><span>✓ 不上传截图</span><span>✓ 原图不修改</span><span>✓ 一键导出 PNG</span></div>
+</section>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
